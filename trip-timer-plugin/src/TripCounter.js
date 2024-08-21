@@ -9,8 +9,8 @@ export default function TripCounter({ tripName, tripTime }) {
 	const [secondsLeft, setSecondsLeft] = useState(
 		calculateSecondsLeft(tripTime),
 	);
-	const encouragement = "Let's go!";
-
+ // Updated encouragement to be dynamic based on time left.
+    // const encouragement = "Let's go!";  // Replaced with dynamic text below.
 	useEffect(() => {
 		const interval = setInterval(() => {
 			setTimeLeft(calculateTimeLeft(tripTime));
@@ -35,6 +35,19 @@ export default function TripCounter({ tripName, tripTime }) {
 
 		return classes.join(" ");
 	}
+	/* New function to dynamically generate encouragement text based on time left.
+       Added three conditions as per instruction plus "Time's up!" as a new condition because it seemed appropriate. */
+    function getEncouragementText(secondsLeft) {
+        if (secondsLeft <= 0) {
+            return "Time's up!";
+        } else if (secondsLeft < 300) { // Less than 5 minutes
+            return "Time to go!";
+        } else if (secondsLeft < 600) { // 5-10 minutes
+            return "Almost time to leave!";
+        } else {
+            return "Let's go!";
+        }
+    }
 
 	function checkEnterKey(event) {
         if (event.key && event.key === 'Enter') {
@@ -104,13 +117,14 @@ export default function TripCounter({ tripName, tripTime }) {
                     <button onClick={addNewTask}>+</button>
                 </div>
                 <div className={encouragementAreaClasses()}>
-                    {encouragement}
+				    {/* Replaced the static encouragement variable with a dynamic function call to display different encouragement text based on the value of 'secondsLeft' */}
+				    {getEncouragementText(secondsLeft)}
                 </div>
             </div>
         </div>
 	);
 }
-
+// updated the calculateSecondsLeft(time) function so it returns 0 if time has run out, avoiding negative numbers.
 function calculateSecondsLeft(time) {
 	const departureTime = new Date();
 	const currentTime = new Date();
@@ -120,8 +134,10 @@ function calculateSecondsLeft(time) {
 	departureTime.setHours(hours);
 	departureTime.setMinutes(minutes);
 	departureTime.setSeconds(0);
-
-	return Math.floor((departureTime - currentTime) / 1000); // millis to seconds
+    // Updated the return statement to include a condition that stops the timer at zero if the time has run out.
+	return Math.floor((departureTime - currentTime) / 1000)  > 0
+    ? Math.floor((departureTime - currentTime) / 1000)
+    : 0; // millis to seconds
 }
 
 function getTimeInfoColorClass(secondsLeft) {
@@ -148,7 +164,7 @@ function niceHumanTime(time) {
 		hour12: true,
 	});
 }
-
+// updated the calculateTimeLeft(time) function to display "00:00" when the time reaches zero, preventing negative time displays.
 function calculateTimeLeft(time) {
 	const now = new Date();
 	const then = new Date();
@@ -160,6 +176,12 @@ function calculateTimeLeft(time) {
 	now.setSeconds(0);
 
 	let secondsLeft = (now - then) / 1000; // millis
+
+// Added an if statement here to display "00:00" when the time reaches zero.
+	   if (secondsLeft <= 0) {
+        return "00:00"; // Stop at zero
+    }
+
 
 	if (secondsLeft > 3600) {
 		let hours = Math.floor(secondsLeft / 3600);

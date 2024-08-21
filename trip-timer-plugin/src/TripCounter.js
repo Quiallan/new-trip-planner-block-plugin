@@ -9,8 +9,8 @@ export default function TripCounter({ tripName, tripTime }) {
 	const [secondsLeft, setSecondsLeft] = useState(
 		calculateSecondsLeft(tripTime),
 	);
-	const encouragement = "Let's go!";
-
+ // Updated encouragement to be dynamic based on time left.
+    // const encouragement = "Let's go!";  // Replaced with dynamic text below.
 	useEffect(() => {
 		const interval = setInterval(() => {
 			setTimeLeft(calculateTimeLeft(tripTime));
@@ -35,6 +35,19 @@ export default function TripCounter({ tripName, tripTime }) {
 
 		return classes.join(" ");
 	}
+	/* New function to dynamically generate encouragement text based on time left.
+       Added three conditions as per instruction plus "Time's up!" as a new condition because it seemed appropriate. */
+    function getEncouragementText(secondsLeft) {
+        if (secondsLeft <= 0) {
+            return "Time's up!";
+        } else if (secondsLeft < 300) { // Less than 5 minutes
+            return "Time to go!";
+        } else if (secondsLeft < 600) { // 5-10 minutes
+            return "Almost time to leave!";
+        } else {
+            return "Let's go!";
+        }
+    }
 
 	function checkEnterKey(event) {
         if (event.key && event.key === 'Enter') {
@@ -104,7 +117,8 @@ export default function TripCounter({ tripName, tripTime }) {
                     <button onClick={addNewTask}>+</button>
                 </div>
                 <div className={encouragementAreaClasses()}>
-                    {encouragement}
+				    {/* Replaced the static encouragement variable with a dynamic function call to display different encouragement text based on the value of 'secondsLeft' */}
+				    {getEncouragementText(secondsLeft)}
                 </div>
             </div>
         </div>
